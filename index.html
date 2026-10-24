@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-172213';
+var BUILD='20261024-172436';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -144,7 +144,8 @@ var BUILD='20261024-172213';
     box-shadow:0 0 0 1px rgba(40,24,12,.35),inset 0 1px 0 rgba(255,225,180,.2)}
   .pbox.hair .lidcover{transform:translateY(-5%)}
   .pbox .lidcover{pointer-events:none}
-  .pbox.solved .lidcover{transform:translateY(-62%) rotate(-8deg)}
+  /* slides off to the side and leans, so nothing sits over the message in the hole */
+  .pbox.solved .lidcover{transform:translate(80%,-26%) rotate(16deg)}
   .pbox.solved .lid{opacity:1}
   .pbox.solved .knot{opacity:0;pointer-events:none}
   .lid .note{font:700 17px/1.05 var(--hand);color:var(--honey-2);text-align:center;transform:rotate(-3deg)}
@@ -449,7 +450,7 @@ var BUILD='20261024-172213';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172213" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172436" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
