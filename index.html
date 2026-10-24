@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-170748';
+var BUILD='20261024-172139';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -119,6 +119,9 @@ var BUILD='20261024-170748';
     background:radial-gradient(circle at 40% 35%,#c48f58,#8b5a31 70%);box-shadow:0 3px 0 #4a2d16,inset 0 1px 0 rgba(255,230,190,.4);
     transition:transform .15s ease,box-shadow .15s ease}
   .peg svg{width:64%;height:64%;stroke:#3a210f;fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+  .ticks{position:absolute;left:38%;right:38%;top:43.2%;display:flex;justify-content:space-between;z-index:2;pointer-events:none}
+  .ticks i{width:13%;aspect-ratio:1;border-radius:50%;background:#4a2d16;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);transition:background .25s,box-shadow .25s}
+  .ticks i.on{background:#f6d68a;box-shadow:0 0 6px rgba(246,214,138,.8)}
   .peg.down{transform:translateY(3px) scale(.94);box-shadow:0 0 0 #4a2d16,inset 0 3px 6px rgba(0,0,0,.45)}
   .pbox .slot{position:absolute;left:20%;right:20%;height:17%;border-radius:4px;background:#24170d;box-shadow:inset 0 4px 10px rgba(0,0,0,.7)}
   .pbox .slot.s1{top:48%} .pbox .slot.s2{top:69%}
@@ -140,7 +143,8 @@ var BUILD='20261024-170748';
     background:var(--grain),linear-gradient(160deg,#a26f3c,#7f532d);background-size:420px 210px,auto;transition:transform .9s cubic-bezier(.5,0,.2,1);
     box-shadow:0 0 0 1px rgba(40,24,12,.35),inset 0 1px 0 rgba(255,225,180,.2)}
   .pbox.hair .lidcover{transform:translateY(-5%)}
-  .pbox.solved .lidcover{transform:translateY(-95%) rotate(-8deg)}
+  .pbox .lidcover{pointer-events:none}
+  .pbox.solved .lidcover{transform:translateY(-62%) rotate(-8deg)}
   .pbox.solved .lid{opacity:1}
   .pbox.solved .knot{opacity:0;pointer-events:none}
   .lid .note{font:700 17px/1.05 var(--hand);color:var(--honey-2);text-align:center;transform:rotate(-3deg)}
@@ -329,6 +333,7 @@ var BUILD='20261024-170748';
           <button class="peg" type="button" data-p="cross" aria-label="Cross peg"><svg viewBox="0 0 64 64" aria-hidden="true" data-i="cross"></svg></button>
           <button class="peg" type="button" data-p="note" aria-label="Music note peg"><svg viewBox="0 0 64 64" aria-hidden="true" data-i="note"></svg></button>
         </div>
+        <div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <div class="slot s1" aria-hidden="true"></div>
         <div class="slot s2" aria-hidden="true"></div>
         <button class="drawer d1" id="d1" type="button" aria-pressed="false" aria-label="Top drawer"><span class="pull" aria-hidden="true"></span></button>
@@ -444,7 +449,7 @@ var BUILD='20261024-170748';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-170748" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172139" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
@@ -684,8 +689,9 @@ var WORK = [
     d1.classList.toggle('open', s.top); d1.setAttribute('aria-pressed', s.top);
     d2.classList.toggle('open', s.bot); d2.setAttribute('aria-pressed', s.bot);
     base.classList.toggle('out', s.baseOut); base.setAttribute('aria-pressed', s.baseOut);
-    var downs = {}; s.entered.forEach(function(x){ downs[x] = true; });
-    pegs.forEach(function(p){ p.classList.toggle('down', s.coded || !!downs[p.getAttribute('data-p')]); });
+    // a peg press is momentary (it springs back); progress shows in the four marks under them
+    pegs.forEach(function(p){ if (s.coded) p.classList.add('down'); else if (!p._t) p.classList.remove('down'); });
+    [].forEach.call(box.querySelectorAll('.ticks i'), function(t, i){ t.classList.toggle('on', s.coded || i < s.entered.length); });
     knot.classList.toggle('loose', s.coded && !s.solved);
     if (s.top){ show('Inside the top drawer', svg('arrowDown', 'arrow')); }
     else if (s.bot){ show('Inside the bottom drawer', CODE.map(function(c){ return svg(c); }).join('')); }
@@ -725,14 +731,16 @@ var WORK = [
       if (s.coded){ say('The pegs are all the way down now.'); return; }
       if (s.top || s.bot){ jiggle(p); say('The peg won\'t go in. A drawer is in the way behind it.'); return; }
       var want = CODE[s.entered.length], got = p.getAttribute('data-p');
+      p.classList.add('down'); clearTimeout(p._t);
+      p._t = setTimeout(function(){ p._t = null; if (!s.coded) p.classList.remove('down'); }, 260);
       if (got !== want){
         s.entered = []; paint(); jiggle(box);
-        say(s.sawBot ? 'Clunk. Every peg pops back up. Wrong order.' : 'Clunk. It pops right back up.');
+        say(s.sawBot ? 'Clunk. The marks go dark. Wrong order.' : 'Clunk. Nothing happens.');
         return;
       }
       s.entered.push(got); buzz();
-      if (s.entered.length === CODE.length){ s.coded = true; say('All three pegs sink in together. Something clicked up top.'); }
-      else say('The peg sinks in and stays.' + (s.entered.length > 1 ? ' (' + s.entered.length + ' in a row)' : ''));
+      if (s.entered.length === CODE.length){ s.coded = true; say('All three pegs sink in and lock. Something clicked up top.'); }
+      else say('Click. A mark under the pegs lights up.');
       paint();
     });
   });
@@ -755,7 +763,7 @@ var WORK = [
   var HINTS = {
     find: ['Look inside every drawer you can open.', 'The burn mark is an arrow. Follow it down, then along.', 'Close the top drawer, then slide the base.'],
     open: ['The bottom drawer only opens while the base is out.', 'Slide the base out, then open the bottom drawer.'],
-    code: ['Those four marks are carved on the front too.', 'The pegs won\'t press while any drawer is out.', 'Close both drawers, then press the pegs in the order from the bottom drawer: cross, note, fleur-de-lis, note.'],
+    code: ['Those marks are carved on the front too.', 'The pegs won\'t press while any drawer is out.', 'Close both drawers, then press the pegs in the order from the bottom drawer: cross, note, fleur-de-lis, note.'],
     lid:  ['Something up top is loose now. Look for the knot.', 'It catches when anything is out of place. Put everything back the way it started.', 'Slide the base back in, close the drawers, then press the knot.']
   };
   hintBtn.addEventListener('click', function(){
