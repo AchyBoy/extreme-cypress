@@ -10,5 +10,5 @@ Names, Youngsville, phone (337) 298-2754, Saturdays from 8 AM. Market location u
 ## Assets
 - Photos: NONE yet. Every frame is a "Photo coming soon" placeholder with a hand drawn line icon (ours).
 - Wood grain, rings, box, icons: drawn in CSS/SVG in this file.
-- `music.m4a`: original waltz written for this site, `~/Development/web-business/music-tools/compose.py cypress`, rendered with the GeneralUser GS soundfont (free for commercial use, license beside it). Ours.
+- `music.m4a`: "A Rainy Day in Love" (easy listening, country and western feel) by Kaazoom, Pixabay #377133 (Pixabay Content License), picked by Andrew 10-24. Leveled to -24 LUFS with 2.5s fades baked in, AAC 96k. (Replaced my original waltz from compose.py cypress.)
 - Fonts: Fraunces, Inter, Caveat (Google Fonts, OFL).

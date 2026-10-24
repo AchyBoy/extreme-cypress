@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-165308';
+var BUILD='20261024-170351';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -410,7 +410,7 @@ var BUILD='20261024-165308';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-165308" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-170351" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
