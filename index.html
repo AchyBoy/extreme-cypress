@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-172139';
+var BUILD='20261024-172213';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -449,7 +449,7 @@ var BUILD='20261024-172139';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172139" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172213" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
@@ -755,7 +755,7 @@ var WORK = [
     s.solved = true; box.classList.add('solved'); paint(); chips(); buzz();
     var sec = Math.round((Date.now() - t0) / 1000), m = Math.floor(sec / 60), ss = ('0' + sec % 60).slice(-2);
     say('You opened it! ' + m + ':' + ss + ', ' + moves + ' moves, ' + (hints ? hints + (hints === 1 ? ' hint.' : ' hints.') : 'no hints. Impressive.') +
-        ' John and Roxanne\'s real boxes are trickier.');
+        ' Have fun with John and Roxanne\'s real puzzle boxes!');
     if (window.track) track('puzzle', 'solved ' + moves + 'm ' + hints + 'h ' + sec + 's');
   });
 
