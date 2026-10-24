@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-172436';
+var BUILD='20261024-172858';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -450,7 +450,7 @@ var BUILD='20261024-172436';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172436" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-172858" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
@@ -660,42 +660,55 @@ var WORK = [
 })();
 
 /* ---------- the puzzle box ----------
-   Five parts and every one of them matters. The rules (keep them in this comment, the
-   hints below depend on them):
-     top drawer     opens only while the base is IN (the base pins it)
-     base           slides only while the top drawer is CLOSED
-     bottom drawer  opens only while the base is OUT; inside it is the code, cross note fleur note
-     pegs           press only while BOTH drawers are closed; wrong one = all pop back up
-     knot           loose once the code is in, but the lid only lifts with the base back IN
-   The top drawer's floor has a burned arrow pointing down and along: the base. */
+   Five parts and every one of them matters, and every new game is shuffled:
+   the code, the order of the pegs on the front, and which drawer is the locked one.
+   The rules (keep them in this comment, the hints below depend on them):
+     free drawer    opens only while the base is IN (the base pins it); floor = burned arrow, down and along
+     base           slides only while BOTH drawers are closed
+     locked drawer  opens only while the base is OUT; floor = the code (4 marks, all 3 symbols used)
+     pegs           press only while BOTH drawers are closed; each press springs back; wrong one = marks go dark
+     knot           loose once the code is in, but the lid only lifts with the base back IN */
 (function(){
   var box = document.getElementById('pbox'), d1 = document.getElementById('d1'), d2 = document.getElementById('d2'),
       base = document.getElementById('base'), knot = document.getElementById('knot'), hint = document.getElementById('hint'),
       inside = document.getElementById('inside'), insideLbl = document.getElementById('insideLbl'), burn = document.getElementById('burn'),
       hintBtn = document.getElementById('hintBtn'), resetBtn = document.getElementById('reset'), movesEl = document.getElementById('moves'),
-      pegs = [].slice.call(box.querySelectorAll('.peg'));
+      pegRow = box.querySelector('.pegs'), pegs = [].slice.call(box.querySelectorAll('.peg'));
   var slow = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var CODE = ['cross', 'note', 'fleur', 'note'];
+  var NAMES = { cross: 'cross', note: 'note', fleur: 'fleur-de-lis' };
+  var CODE, FREE, LOCK, freeName, lockName;
   var s, t0, moves, hints, hintAt;
   function svg(i, cls){ return '<svg viewBox="0 0 64 64" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : '') + '>' + ICONS[i] + '</svg>'; }
   pegs.forEach(function(p){ p.querySelector('svg').innerHTML = ICONS[p.querySelector('svg').getAttribute('data-i')]; });
+  function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
 
+  function shuffle(){
+    var sym = ['cross', 'note', 'fleur'];
+    do { CODE = [pick(sym), pick(sym), pick(sym), pick(sym)]; }
+    while (sym.some(function(x){ return CODE.indexOf(x) < 0; }));   // every peg gets used
+    var order = pegs.slice();
+    for (var i = order.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+    order.forEach(function(p){ pegRow.appendChild(p); });
+    if (Math.random() < .5){ FREE = d1; LOCK = d2; freeName = 'top'; lockName = 'bottom'; }
+    else { FREE = d2; LOCK = d1; freeName = 'bottom'; lockName = 'top'; }
+  }
   function fresh(){
-    s = { top: false, bot: false, baseOut: false, entered: [], coded: false, solved: false, sawTop: false, sawBot: false };
+    shuffle();
+    s = { free: false, lock: false, baseOut: false, entered: [], coded: false, solved: false, sawFree: false, sawLock: false };
     t0 = 0; moves = 0; hints = 0; hintAt = {};
     box.classList.remove('solved', 'hair'); knot.classList.remove('loose');
-    paint(); say('A real puzzle box. Drawers, pegs, the base, the knot: everything is a part. Most people need a hint or two.');
+    paint(); say('A real puzzle box, and it changes every game. Drawers, pegs, the base, the knot: everything is a part. Most people need a hint or two.');
   }
   function paint(){
-    d1.classList.toggle('open', s.top); d1.setAttribute('aria-pressed', s.top);
-    d2.classList.toggle('open', s.bot); d2.setAttribute('aria-pressed', s.bot);
+    FREE.classList.toggle('open', s.free); FREE.setAttribute('aria-pressed', s.free);
+    LOCK.classList.toggle('open', s.lock); LOCK.setAttribute('aria-pressed', s.lock);
     base.classList.toggle('out', s.baseOut); base.setAttribute('aria-pressed', s.baseOut);
     // a peg press is momentary (it springs back); progress shows in the four marks under them
     pegs.forEach(function(p){ if (s.coded) p.classList.add('down'); else if (!p._t) p.classList.remove('down'); });
     [].forEach.call(box.querySelectorAll('.ticks i'), function(t, i){ t.classList.toggle('on', s.coded || i < s.entered.length); });
     knot.classList.toggle('loose', s.coded && !s.solved);
-    if (s.top){ show('Inside the top drawer', svg('arrowDown', 'arrow')); }
-    else if (s.bot){ show('Inside the bottom drawer', CODE.map(function(c){ return svg(c); }).join('')); }
+    if (s.free) show('Inside the ' + freeName + ' drawer', svg('arrowDown', 'arrow'));
+    else if (s.lock) show('Inside the ' + lockName + ' drawer', CODE.map(function(c){ return svg(c).replace('<svg', '<svg data-c="' + c + '"'); }).join(''));
     else inside.hidden = true;
     movesEl.textContent = moves ? moves + (moves === 1 ? ' move' : ' moves') : '';
   }
@@ -705,23 +718,21 @@ var WORK = [
   function jiggle(el){ if (slow) return; el.classList.remove('rattle'); void el.offsetWidth; el.classList.add('rattle'); }
   function buzz(){ try { navigator.vibrate && navigator.vibrate(12); } catch (e) {} }
 
-  d1.addEventListener('click', function(){
+  function drawer(isFree){
     if (s.solved) return; move();
-    if (s.top){ s.top = false; say('Slid shut.'); }
-    else if (s.baseOut){ jiggle(d1); say('The top drawer won\'t budge. Something underneath is pinning it.'); }
-    else { s.top = true; s.sawTop = true; say('It slides out. Something is burned into the bottom of it.'); }
+    var el = isFree ? FREE : LOCK, key = isFree ? 'free' : 'lock', name = isFree ? freeName : lockName;
+    if (s[key]){ s[key] = false; say('Slid shut.'); }
+    else if (isFree && s.baseOut){ jiggle(el); say('The ' + name + ' drawer won\'t budge. Something underneath is pinning it.'); }
+    else if (!isFree && !s.baseOut){ jiggle(el); say('Locked tight. It rattles, so it is held from somewhere.'); }
+    else if (isFree){ s.free = true; s.sawFree = true; say('It slides out. Something is burned into the bottom of it.'); }
+    else { s.lock = true; s.sawLock = true; say('It opens! Four marks burned inside. Better remember them.'); buzz(); }
     paint();
-  });
-  d2.addEventListener('click', function(){
-    if (s.solved) return; move();
-    if (s.bot){ s.bot = false; say('Slid shut.'); }
-    else if (!s.baseOut){ jiggle(d2); say('Locked tight. It rattles, so it is held from somewhere.'); }
-    else { s.bot = true; s.sawBot = true; say('It opens! Four marks burned inside. Better remember them.'); buzz(); }
-    paint();
-  });
+  }
+  d1.addEventListener('click', function(){ drawer(FREE === d1); });
+  d2.addEventListener('click', function(){ drawer(FREE === d2); });
   base.addEventListener('click', function(){
     if (s.solved) return; move();
-    if (s.top){ jiggle(base); say('The base is stuck while the top drawer is out.'); paint(); return; }
+    if (s.free || s.lock){ jiggle(base); say('The base is stuck while a drawer is out.'); paint(); return; }
     s.baseOut = !s.baseOut;
     say(s.baseOut ? 'Click. The base slides out to one side.' : 'Click. The base slides back home.');
     buzz(); paint();
@@ -730,13 +741,13 @@ var WORK = [
     p.addEventListener('click', function(){
       if (s.solved) return; move();
       if (s.coded){ say('The pegs are all the way down now.'); return; }
-      if (s.top || s.bot){ jiggle(p); say('The peg won\'t go in. A drawer is in the way behind it.'); return; }
+      if (s.free || s.lock){ jiggle(p); say('The peg won\'t go in. A drawer is in the way behind it.'); return; }
       var want = CODE[s.entered.length], got = p.getAttribute('data-p');
       p.classList.add('down'); clearTimeout(p._t);
       p._t = setTimeout(function(){ p._t = null; if (!s.coded) p.classList.remove('down'); }, 260);
       if (got !== want){
         s.entered = []; paint(); jiggle(box);
-        say(s.sawBot ? 'Clunk. The marks go dark. Wrong order.' : 'Clunk. Nothing happens.');
+        say(s.sawLock ? 'Clunk. The marks go dark. Wrong order.' : 'Clunk. Nothing happens.');
         return;
       }
       s.entered.push(got); buzz();
@@ -749,7 +760,7 @@ var WORK = [
     if (s.solved) return; move();
     knot.classList.add('press'); setTimeout(function(){ knot.classList.remove('press'); }, 220);
     if (!s.coded){ say('Just a knot in the wood. It doesn\'t move. Yet.'); return; }
-    if (s.baseOut || s.top || s.bot){
+    if (s.baseOut || s.free || s.lock){
       box.classList.add('hair'); setTimeout(function(){ box.classList.remove('hair'); }, 450);
       say('The lid lifts a hair, then catches. Something is still out of place.'); return;
     }
@@ -760,25 +771,28 @@ var WORK = [
     if (window.track) track('puzzle', 'solved ' + moves + 'm ' + hints + 'h ' + sec + 's');
   });
 
-  /* three hints per stage, gentlest first */
-  var HINTS = {
-    find: ['Look inside every drawer you can open.', 'The burn mark is an arrow. Follow it down, then along.', 'Close the top drawer, then slide the base.'],
-    open: ['The bottom drawer only opens while the base is out.', 'Slide the base out, then open the bottom drawer.'],
-    code: ['Those marks are carved on the front too.', 'The pegs won\'t press while any drawer is out.', 'Close both drawers, then press the pegs in the order from the bottom drawer: cross, note, fleur-de-lis, note.'],
-    lid:  ['Something up top is loose now. Look for the knot.', 'It catches when anything is out of place. Put everything back the way it started.', 'Slide the base back in, close the drawers, then press the knot.']
-  };
+  /* three hints per stage, gentlest first; built per game since the drawers and code move */
+  function HINTS(st){
+    return {
+      find: ['Look inside every drawer you can open.', 'The burn mark is an arrow. Follow it down, then along.', 'Close the ' + freeName + ' drawer, then slide the base.'],
+      open: ['The ' + lockName + ' drawer only opens while the base is out.', 'Slide the base out, then open the ' + lockName + ' drawer.'],
+      code: ['Those marks are carved on the front too.', 'The pegs won\'t press while any drawer is out.',
+             'Close both drawers, then press the pegs in the order from the ' + lockName + ' drawer: ' + CODE.map(function(c){ return NAMES[c]; }).join(', ') + '.'],
+      lid:  ['Something up top is loose now. Look for the knot.', 'It catches when anything is out of place. Put everything back the way it started.', 'Slide the base back in, close the drawers, then press the knot.']
+    }[st];
+  }
   hintBtn.addEventListener('click', function(){
     if (s.solved) return;
-    var st = s.coded ? 'lid' : s.sawBot ? 'code' : (s.sawTop && s.baseOut) ? 'open' : 'find';
-    var n = hintAt[st] = Math.min((hintAt[st] == null ? -1 : hintAt[st]) + 1, HINTS[st].length - 1); hints++;
-    say('Hint: ' + HINTS[st][n]);
+    var st = s.coded ? 'lid' : s.sawLock ? 'code' : (s.sawFree && s.baseOut) ? 'open' : 'find', list = HINTS(st);
+    var n = hintAt[st] = Math.min((hintAt[st] == null ? -1 : hintAt[st]) + 1, list.length - 1); hints++;
+    say('Hint: ' + list[n]);
     if (window.track) track('puzzle', 'hint ' + st);
   });
   resetBtn.addEventListener('click', fresh);
   fresh();
 
-  // the bottom drawer twitches once, a nudge that the parts move
-  if (!slow) setTimeout(function(){ if (!moves){ jiggle(d2); } }, 2400);
+  // the locked drawer twitches once, a nudge that the parts move
+  if (!slow) setTimeout(function(){ if (!moves){ jiggle(LOCK); } }, 2400);
 
   // wood chips fly out of the lid when it opens
   function chips(){
