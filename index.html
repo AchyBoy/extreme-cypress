@@ -13,7 +13,7 @@
    fetched with a unique URL (never cached); if it names a newer build than this
    page, hop once to ?v=<build>, a URL the cache has never seen. No popup.
    deploy.sh stamps BUILD, version.json and every asset ?v= together. */
-var BUILD='20261024-173153';
+var BUILD='20261026-220433';
 (function(){
   if(location.protocol==='file:') return;
   window.__freshPending=true;   /* the visit tracker waits on this so a hop counts once */
@@ -210,6 +210,31 @@ var BUILD='20261024-173153';
   .feat li + li{border-top:1px dashed #d9c3a1}
 
   /* cypress story band */
+
+  /* DOVETAIL JOINT between a dark section and a cream one (mockup 10-26).
+     .dt hangs dark tails DOWN from the section above; .dt.up flips it so they rise from below. */
+  .dt{height:32px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='32'><rect width='80' height='32' fill='%23faf3e7'/><path d='M0 4L3 30M74 4L77 30' stroke='%23e2cfae' stroke-width='1'/><path d='M16 0H64L73 32H7Z' fill='%2324180f'/><path d='M25 1L22 31M36 1L35 31M47 1L48 31M57 1L61 31' stroke='%234a3221' stroke-width='1.1' opacity='.85'/><path d='M16 0L7 32M64 0L73 32' stroke='%23c8894a' stroke-width='1.4'/></svg>") 0 0/80px 32px repeat-x;position:relative;z-index:1}
+  .dt.up{transform:scaleY(-1)}
+  @media (max-width:600px){.dt{height:24px;background-size:60px 24px}}
+
+
+  /* TRY THE PLANE (mockup 10-26): a rough board, the visitor drags the plane along it,
+     every pass takes the high spots down and throws real shavings; smooth = their name burns in. */
+  #tryplane{padding-top:20px}
+  .tp{position:relative;margin-top:26px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+  .tp.drag{cursor:grabbing}
+  .tp canvas{display:block;width:100%}
+  .tp .pl{position:absolute;left:0;top:0;height:auto;pointer-events:none;filter:drop-shadow(0 6px 7px rgba(0,0,0,.35));will-change:transform}
+  .tp .sh{position:absolute;left:0;top:0;width:46px;height:auto;pointer-events:none;will-change:transform,opacity;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3))}
+  .tp .pl.nudge{animation:tpNudge 1.6s ease-in-out infinite}
+  @keyframes tpNudge{0%,100%{margin-left:0}50%{margin-left:14px}}
+  .tp-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;min-height:50px;flex-wrap:wrap}
+  .tp-say{font:600 15px/1.4 var(--sans);color:var(--muted)}
+  .tp-say b{color:var(--ink)}
+  .tp-reset{font:600 14px var(--sans);background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px}
+  .tp-done{display:none}
+  .tp-done.on{display:inline-flex}
+  @media (max-width:600px){.tp .sh{width:32px}}
   .band{background:var(--heart);color:var(--cream);overflow:hidden}
   .band::before{content:"";position:absolute;inset:0;background:var(--grain);background-size:600px 300px;opacity:.55;mix-blend-mode:multiply}
   .band .wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
@@ -358,6 +383,7 @@ var BUILD='20261024-173153';
     </div>
   </div>
 </section>
+<div class="dt" aria-hidden="true"></div>
 
 <section id="story">
   <div class="wrap story">
@@ -391,6 +417,25 @@ var BUILD='20261024-173153';
   </div>
 </section>
 
+<section id="tryplane">
+  <div class="wrap">
+    <p class="eyebrow rv">Try it</p>
+    <h2 class="rv">Every piece starts <em>rough.</em></h2>
+    <p class="lead rv">Grab the plane and push it along the board. A few passes and it comes up smooth.</p>
+    <div class="tp" id="tp" aria-label="A rough board and a hand plane. Drag along the board to plane it smooth.">
+      <canvas id="tpCv"></canvas>
+      <img class="pl nudge" id="tpPl" src="img/plane.webp" alt="">
+    </div>
+    <div class="tp-bar">
+      <span class="tp-say" id="tpSay">← Drag the plane along the board →</span>
+      <span>
+        <a class="btn tp-done" id="tpDone" href="#request">Ask about a piece</a>
+        <button type="button" class="tp-reset" id="tpReset">Rough it up again</button>
+      </span>
+    </div>
+  </div>
+</section>
+<div class="dt up" aria-hidden="true"></div>
 <section class="band" id="cypress">
   <svg class="rings" viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke="#e2a865" stroke-width="1.2"><circle cx="100" cy="100" r="12"/><circle cx="101" cy="99" r="24"/><circle cx="99" cy="101" r="37"/><circle cx="102" cy="100" r="50"/><circle cx="100" cy="98" r="63"/><circle cx="98" cy="101" r="76"/><circle cx="101" cy="100" r="89"/></g></svg>
   <div class="wrap">
@@ -408,6 +453,7 @@ var BUILD='20261024-173153';
     </ol>
   </div>
 </section>
+<div class="dt" aria-hidden="true"></div>
 
 <section id="request">
   <div class="wrap req">
@@ -449,6 +495,7 @@ var BUILD='20261024-173153';
 </section>
 </main>
 
+<div class="dt up" aria-hidden="true"></div>
 <footer>
   <b>Extreme Cypress</b>
   Handcrafted in Youngsville, Louisiana by John &amp; Roxanne Grubb<br>
@@ -476,7 +523,7 @@ var BUILD='20261024-173153';
   </div>
 </div>
 
-<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261024-173153" type="audio/mp4"></audio>
+<audio id="bgm" loop preload="none" playsinline><source src="music.m4a?v=20261026-220433" type="audio/mp4"></audio>
 <button class="music-btn" id="musicbtn" type="button" aria-pressed="false" aria-label="Play music"><span class="eq"><i></i><i></i><i></i></span><span id="musiclbl">Play music</span></button>
 <script>
 /* Music diagnostics, hidden unless the URL has ?debug=1. Ask for the Copy output. */
@@ -923,6 +970,106 @@ var WORK = [
       dust.appendChild(s);
     }
   }
+})();
+</script>
+
+
+<script>
+/* TRY THE PLANE. The board is a canvas; H[i] is how far the top edge stands proud of
+   flat at column i (COL px wide). The plane's sole rides on the highest point under
+   it, so it can only take the PEAKS off, DEPTH px a pass, like a real one. Cut wood
+   adds up and every SHAVE units of it throws one of the six real shavings out of the
+   mouth. Under 5% left = smooth: the rest goes, the face warms up and their name burns in. */
+(function(){
+  var box=document.getElementById('tp'); if(!box) return;
+  var cv=document.getElementById('tpCv'), g=cv.getContext('2d'), pl=document.getElementById('tpPl');
+  var say=document.getElementById('tpSay'), done=document.getElementById('tpDone');
+  var COL=2, DEPTH=9, SHAVE=40, MOUTH=.48;
+  var W=0, Hh=0, top=0, bh=0, H=[], H0=0, px=0, pw=0, ph=0, grain=[], acc=0, n=0, smooth=false, glow=0, drag=false, lastX=null, moved=false;
+  function rough(){
+    var c=Math.ceil(W/COL), a=[], k, i, amp=Math.min(22, bh*.2);
+    var waves=[[amp*.45,Math.random()*6,2.1],[amp*.3,Math.random()*6,5.3],[amp*.18,Math.random()*6,11.7]];
+    for(i=0;i<c;i++){ var x=i/c, h=amp*.35;
+      for(k=0;k<3;k++) h+=waves[k][0]*Math.sin(waves[k][1]+x*Math.PI*2*waves[k][2]);
+      h+=(Math.random()-.5)*2.5; a.push(Math.max(1.5,h)); }
+    H=a; H0=a.reduce(function(s,v){return s+v;},0); acc=0; smooth=false; glow=0;
+    done.classList.remove('on'); say.innerHTML='← Drag the plane along the board →';
+  }
+  function size(){
+    W=box.clientWidth; pw=Math.max(150,Math.min(300,W*.3)); bh=Math.max(90,Math.min(150,W*.16));
+    pl.style.width=pw+'px'; ph=pw*262/700; top=ph+30; Hh=top+bh+8;
+    var d=window.devicePixelRatio||1; cv.width=W*d; cv.height=Hh*d; cv.style.height=Hh+'px'; g.setTransform(d,0,0,d,0,0);
+    grain=[]; for(var i=0;i<14;i++) grain.push({y:top+8+i*(bh-14)/13+(Math.random()-.5)*4,a:1+Math.random()*2.5,f:.004+Math.random()*.01,p:Math.random()*6,w:.6+Math.random()*1.2,dark:Math.random()<.5});
+    if(!H.length||Math.abs(H.length-Math.ceil(W/COL))>2) rough();
+    px=Math.min(px,W-pw*.5); draw(); place();
+  }
+  function soleMax(x){ var a=Math.max(0,Math.floor((x+pw*.03)/COL)), b=Math.min(H.length-1,Math.floor((x+pw*.97)/COL)), m=0;
+    for(var i=a;i<=b;i++) if(H[i]>m) m=H[i]; return m; }
+  function place(){ pl.style.transform='translate('+px+'px,'+(top-soleMax(px)-ph+2)+'px)'; }
+  function left(){ return H.reduce(function(s,v){return s+v;},0)/H0; }
+  function draw(){
+    g.clearRect(0,0,W,Hh);
+    // board face, fresh cypress, then weathering that lifts as it gets smooth
+    var gr=g.createLinearGradient(0,top,0,top+bh); gr.addColorStop(0,'#e2a865'); gr.addColorStop(.5,'#c8894a'); gr.addColorStop(1,'#9a6233');
+    g.beginPath(); g.moveTo(0,top+bh); g.lineTo(0,top-H[0]);
+    for(var i=0;i<H.length;i++) g.lineTo(i*COL,top-H[i]);
+    g.lineTo(W,top-H[H.length-1]); g.lineTo(W,top+bh); g.closePath();
+    g.save(); g.clip();
+    g.fillStyle=gr; g.fillRect(0,0,W,Hh);
+    grain.forEach(function(l){ g.beginPath(); for(var x=0;x<=W;x+=8){ var y=l.y+l.a*Math.sin(l.p+x*l.f)+1.4*Math.sin(x*.031+l.p); x?g.lineTo(x,y):g.moveTo(x,y);} g.strokeStyle=l.dark?'rgba(90,50,20,.35)':'rgba(255,230,190,.25)'; g.lineWidth=l.w; g.stroke(); });
+    var wear=Math.min(1,left()*1.3)*(1-glow);
+    if(wear>0){ g.fillStyle='rgba(96,86,74,'+(.62*wear)+')'; g.fillRect(0,0,W,Hh); }
+    if(glow>0){ g.globalAlpha=glow; g.font='700 '+Math.round(bh*.34)+'px Fraunces, Georgia, serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillStyle='rgba(60,28,10,.82)'; g.shadowColor='rgba(255,200,130,.5)'; g.shadowBlur=2; g.fillText('Extreme Cypress',W/2,top+bh*.5); g.globalAlpha=1; }
+    g.restore();
+    // a lighter line where the top edge has been cut fresh
+    g.beginPath(); for(i=0;i<H.length;i++){ var y=top-H[i]; i?g.lineTo(i*COL,y):g.moveTo(0,y);} g.strokeStyle='rgba(255,236,200,.55)'; g.lineWidth=1.2; g.stroke();
+    g.fillStyle='rgba(0,0,0,.12)'; g.fillRect(0,top+bh,W,4);
+  }
+  function shave(dir,big){
+    var s=new Image(); s.className='sh'; s.alt=''; s.src='img/shaving-'+(n++%6+1)+'.webp';
+    var mx=px+pw*MOUTH, my=top-soleMax(px)-ph*.55, sc=big?1.25:.85+Math.random()*.3;
+    box.appendChild(s);
+    var dx=-dir*(40+Math.random()*90), up=60+Math.random()*90, r=(Math.random()*2-1)*260, d=1500+Math.random()*900;
+    s.animate([
+      {transform:'translate('+mx+'px,'+my+'px) scale(.25) rotate(0)',opacity:0},
+      {transform:'translate('+(mx+dx*.35)+'px,'+(my-up*.5)+'px) scale('+sc+') rotate('+r*.4+'deg)',opacity:1,offset:.3},
+      {transform:'translate('+(mx+dx)+'px,'+(my-up)+'px) scale('+sc*.9+') rotate('+r+'deg)',opacity:0}
+    ],{duration:d,easing:'cubic-bezier(.2,.7,.4,1)',fill:'forwards'}).onfinish=function(){s.remove();};
+  }
+  function cut(fromX,toX){
+    var dir=toX>fromX?1:-1, step=COL*dir, cutNow=0;
+    for(var x=fromX; dir>0?x<toX:x>toX; x+=step){
+      // only the BLADE cuts, one column as it passes, down to DEPTH under the highest
+      // point the sole is resting on, so each pass takes the peaks down a little
+      var i=Math.floor((x+pw*MOUTH)/COL), lvl=Math.max(0,soleMax(x)-DEPTH);
+      if(i>=0&&i<H.length&&H[i]>lvl){ cutNow+=H[i]-lvl; H[i]=lvl; }
+    }
+    acc+=cutNow;
+    var fast=Math.abs(toX-fromX)>40;
+    while(acc>SHAVE){ acc-=SHAVE; shave(dir,fast); }
+    var l=left();
+    if(!smooth){
+      if(l<.05){ smooth=true; H=H.map(function(){return 0;}); burn(); }
+      else say.innerHTML='Smooth: <b>'+Math.round((1-l)*100)+'%</b>';
+    }
+  }
+  function burn(){
+    say.innerHTML='<b>Smooth.</b> Every piece starts just like this.';
+    done.classList.add('on');
+    var t0=performance.now();
+    (function f(t){ glow=Math.min(1,(t-t0)/1400); draw(); if(glow<1) requestAnimationFrame(f); })(t0);
+  }
+  function xAt(e){ var r=box.getBoundingClientRect(); return Math.max(-pw*MOUTH,Math.min(W-pw*MOUTH,e.clientX-r.left-pw*.5)); }   // the blade reaches both ends
+  box.addEventListener('pointerdown',function(e){ drag=true; box.classList.add('drag'); pl.classList.remove('nudge'); lastX=px; try{box.setPointerCapture(e.pointerId);}catch(_){} move(e); });
+  function move(e){ if(!drag) return; var x=xAt(e); if(x!==lastX){ cut(lastX,x); px=x; lastX=x; draw(); place(); } }
+  box.addEventListener('pointermove',move);
+  function up(){ drag=false; box.classList.remove('drag'); }
+  box.addEventListener('pointerup',up); box.addEventListener('pointercancel',up);
+  document.getElementById('tpReset').addEventListener('click',function(){ rough(); draw(); place(); });
+  var rz; addEventListener('resize',function(){ clearTimeout(rz); rz=setTimeout(size,150); });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(size);
+  if(pl.complete) size(); else pl.onload=size;
 })();
 </script>
 </body>
